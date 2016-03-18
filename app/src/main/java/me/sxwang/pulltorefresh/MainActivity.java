@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         }
         mListView = (ListView) findViewById(android.R.id.list);
         mListView.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,list));
+
     }
 
     @Override

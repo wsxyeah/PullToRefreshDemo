@@ -43,10 +43,6 @@ public class PullToRefreshLayout extends LinearLayout {
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
     }
 
-    private int dpToPx(int dp) {
-        return Math.round(getContext().getResources().getDisplayMetrics().density * dp);
-    }
-
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -86,7 +82,7 @@ public class PullToRefreshLayout extends LinearLayout {
         float scrollY = event.getY() - mActionDownY;
 //        Log.i(TAG, "onTouchEvent: " + scrollY);
 
-        int scrollThreshold = dpToPx(DEFAULT_SCROLL_THRESHOLD);
+        int scrollThreshold = Utils.dpToPx(getContext(), DEFAULT_SCROLL_THRESHOLD);
         if (event.getActionMasked() == MotionEvent.ACTION_UP) {
             if (scrollY < scrollThreshold) {
                 collapseHeader();
@@ -100,7 +96,7 @@ public class PullToRefreshLayout extends LinearLayout {
         }
 
         // animating progress
-        int maxScrollHeight = dpToPx(DEFAULT_MAX_SCROLL_HEIGHT);
+        int maxScrollHeight = Utils.dpToPx(getContext(), DEFAULT_MAX_SCROLL_HEIGHT);
         if (scrollY <= maxScrollHeight) {
             ViewGroup.LayoutParams lp = mRefreshHeader.getLayoutParams();
             lp.height = (int) (scrollY * 0.55);
