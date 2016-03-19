@@ -99,7 +99,7 @@ public class PullToRefreshLayout extends LinearLayout {
         int maxScrollHeight = Utils.dpToPx(getContext(), DEFAULT_MAX_SCROLL_HEIGHT);
         if (scrollY <= maxScrollHeight) {
             ViewGroup.LayoutParams lp = mRefreshHeader.getLayoutParams();
-            lp.height = (int) (scrollY * 0.55);
+            lp.height = Math.round(scrollY * 0.55f);
             mRefreshHeader.setLayoutParams(lp);
             mRefreshHeader.setProgress(Math.round(scrollY * 100 / scrollThreshold));
         }

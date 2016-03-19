@@ -72,8 +72,8 @@ public class RefreshHeader extends RelativeLayout {
     }
 
     private void refresh() {
-        float percent = (float) (mProgress / 100.0);
-        mTextView.setAlpha((float) (percent / 3.0));
+        float percent = mProgress / 100f;
+        mTextView.setAlpha(percent / 3);
 
         mCircleGap = Math.round(mCircleBaseGap + 90 * percent);
         invalidate();
