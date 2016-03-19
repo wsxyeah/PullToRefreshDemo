@@ -25,8 +25,13 @@ public class MainActivity extends AppCompatActivity {
         mPullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.pullToRefreshLayout);
         mPullToRefreshLayout.setOnRefreshListener(new PullToRefreshLayout.OnRefreshListener() {
             @Override
-            public void onRefresh(PullToRefreshLayout pullToRefreshLayout) {
-                pullToRefreshLayout.setRefreshing(false);
+            public void onRefresh(final PullToRefreshLayout pullToRefreshLayout) {
+                pullToRefreshLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        pullToRefreshLayout.setRefreshing(false);
+                    }
+                }, 1000);
             }
         });
 

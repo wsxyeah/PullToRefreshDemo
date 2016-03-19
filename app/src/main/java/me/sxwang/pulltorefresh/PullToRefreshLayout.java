@@ -85,6 +85,7 @@ public class PullToRefreshLayout extends LinearLayout {
         int scrollThreshold = Utils.dpToPx(getContext(), DEFAULT_SCROLL_THRESHOLD);
         if (event.getActionMasked() == MotionEvent.ACTION_UP) {
             isRefreshing = scrollY >= scrollThreshold;
+            mRefreshHeader.setRefreshing(isRefreshing);
 
             if (!isRefreshing) {
                 collapseHeader();
@@ -103,7 +104,6 @@ public class PullToRefreshLayout extends LinearLayout {
             lp.height = Math.round(scrollY * 0.55f);
             mRefreshHeader.setLayoutParams(lp);
             mRefreshHeader.setProgress(Math.round(scrollY * 100 / scrollThreshold));
-            mRefreshHeader.setRefreshing(isRefreshing);
         }
 
         return super.onTouchEvent(event);
@@ -129,9 +129,9 @@ public class PullToRefreshLayout extends LinearLayout {
 
     public void setRefreshing(boolean isRefreshing) {
         this.isRefreshing = isRefreshing;
+        mRefreshHeader.setRefreshing(isRefreshing);
         if (!isRefreshing) {
             collapseHeader();
-            mRefreshHeader.setProgress(0);
         }
     }
 
