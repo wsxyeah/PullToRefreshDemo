@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Pull To Refresh</string>
     <string name="action_settings">Settings</string>
-    <string name="lorem">lorem\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nlorem</string>
+    <string name="prompt_pull_to_refreshing">Pull to refresh</string>
+    <string name="prompt_refreshing">Refreshing</string>
 </resources>

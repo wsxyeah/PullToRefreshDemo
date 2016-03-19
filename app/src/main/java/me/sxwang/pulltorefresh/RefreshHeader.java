@@ -16,11 +16,13 @@ import android.widget.TextView;
 public class RefreshHeader extends RelativeLayout {
 
     private int mProgress;
+    private boolean isRefreshing;
     private TextView mTextView;
 
     private int mCircleCount = 5;
     private int mCircleRadius = 20;
     private int mCircleBaseGap = 30;
+    private int mMaxExpandableGap = 100;
     private int mCircleGap = mCircleBaseGap;
 
     private RectF mCircleRectF = new RectF();
@@ -41,19 +43,18 @@ public class RefreshHeader extends RelativeLayout {
 
     private void init(final Context context, AttributeSet attrs, int defStyleAttr) {
         mTextView = new TextView(context);
-        TextViewCompat.setTextAppearance(mTextView, android.support.design.R.style.TextAppearance_AppCompat_Body1);
-        mTextView.setAlpha(0);
-        mTextView.setText("Pull to Refresh");
+        TextViewCompat.setTextAppearance(mTextView, android.support.design.R.style.TextAppearance_AppCompat_Body2);
         addView(mTextView);
 
         LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        lp.bottomMargin = Utils.dpToPx(getContext(), 16);
+        lp.bottomMargin = Utils.dpToPx(getContext(), 8);
         lp.addRule(CENTER_HORIZONTAL);
         lp.addRule(ALIGN_PARENT_BOTTOM);
         mTextView.setLayoutParams(lp);
 
         mCirclePaint.setColor(Color.GRAY);
         setWillNotDraw(false);
+        refresh();
     }
 
     @Override
@@ -75,14 +76,12 @@ public class RefreshHeader extends RelativeLayout {
         float percent = mProgress / 100f;
         mTextView.setAlpha(percent / 3);
 
-        mCircleGap = Math.round(mCircleBaseGap + 90 * percent);
+        mCircleGap = Math.round(mCircleBaseGap + mMaxExpandableGap * percent);
+        mCirclePaint.setAlpha(Math.round(255 * Math.min(percent, 1f)));
         invalidate();
 
-        if (mProgress == 0) {
-            mTextView.setText("Pull to Refresh");
-        } else if (mProgress == 100) {
-            mTextView.setText("Refreshing");
-        }
+        mTextView.setText(isRefreshing ? getResources().getString(R.string.prompt_refreshing) :
+                getResources().getString(R.string.prompt_pull_to_refreshing));
     }
 
     public int getProgress() {
@@ -91,6 +90,15 @@ public class RefreshHeader extends RelativeLayout {
 
     public void setProgress(int progress) {
         mProgress = progress;
+        refresh();
+    }
+
+    public boolean isRefreshing() {
+        return isRefreshing;
+    }
+
+    public void setRefreshing(boolean isRefreshing) {
+        this.isRefreshing = isRefreshing;
         refresh();
     }
 }
