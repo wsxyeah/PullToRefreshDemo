@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
@@ -65,7 +66,7 @@ public class PullToRefreshLayout extends LinearLayout {
                 if (listScrollY == 0) mActionDownY = ev.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (listScrollY == 0 && ev.getY() > mActionDownY) {
+                if (listScrollY == 0 && ev.getY() > mActionDownY + ViewConfiguration.get(getContext()).getScaledTouchSlop()) {
                     return true;
                 }
                 break;
