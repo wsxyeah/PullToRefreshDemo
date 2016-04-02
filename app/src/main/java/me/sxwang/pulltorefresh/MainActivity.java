@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
                 pullToRefreshLayout.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        pullToRefreshLayout.setRefreshing(false);
+                        pullToRefreshLayout.setState(PullToRefreshLayout.STATE_RESULT_OK);
                     }
                 }, 1000);
             }
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
             list.add("Item " + i);
         }
         mListView = (ListView) findViewById(android.R.id.list);
-        mListView.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,list));
+        mListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list));
 
     }
 

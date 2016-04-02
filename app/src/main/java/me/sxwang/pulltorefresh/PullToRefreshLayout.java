@@ -27,12 +27,18 @@ public class PullToRefreshLayout extends LinearLayout {
     public static final int DEFAULT_MAX_SCROLL_HEIGHT = 256;
     public static final int DEFAULT_COLLAPSE_DURATION = 250;
 
+
+    public static final int STATE_UNSTARTED = 0;
+    public static final int STATE_REFRESHING = 1;
+    public static final int STATE_RESULT_OK = 2;
+    public static final int STATE_RESULT_FAIL = 3;
+
     private RefreshHeader mRefreshHeader;
     private View mScrollableView;
 
     private int mTouchSlop = 0;
     private float mActionDownY = 0;
-    private boolean isRefreshing = false;
+    private int mState = STATE_UNSTARTED;
 
     public PullToRefreshLayout(Context context) {
         this(context, null);
@@ -93,10 +99,10 @@ public class PullToRefreshLayout extends LinearLayout {
 
         int scrollThreshold = Utils.dpToPx(getContext(), DEFAULT_SCROLL_THRESHOLD);
         if (event.getActionMasked() == MotionEvent.ACTION_UP) {
-            isRefreshing = scrollY >= scrollThreshold;
-            mRefreshHeader.setRefreshing(isRefreshing);
+            boolean shouldRefresh = scrollY >= scrollThreshold;
+            mRefreshHeader.setState(shouldRefresh ? STATE_REFRESHING : STATE_UNSTARTED);
 
-            if (!isRefreshing) {
+            if (!shouldRefresh) {
                 collapseHeader();
             } else {
                 if (mOnRefreshListener != null) {
@@ -132,15 +138,21 @@ public class PullToRefreshLayout extends LinearLayout {
         animator.setDuration(DEFAULT_COLLAPSE_DURATION).start();
     }
 
-    public boolean isRefreshing() {
-        return isRefreshing;
+
+    public int getState() {
+        return mState;
     }
 
-    public void setRefreshing(boolean isRefreshing) {
-        this.isRefreshing = isRefreshing;
-        mRefreshHeader.setRefreshing(isRefreshing);
-        if (!isRefreshing) {
-            collapseHeader();
+    public void setState(int state) {
+        mState = state;
+        mRefreshHeader.setState(mState);
+        if (mState != STATE_REFRESHING) {
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    collapseHeader();
+                }
+            }, 500);
         }
     }
 

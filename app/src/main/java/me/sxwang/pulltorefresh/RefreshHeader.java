@@ -15,9 +15,10 @@ import android.widget.TextView;
  */
 public class RefreshHeader extends RelativeLayout {
 
+    private int mState = PullToRefreshLayout.STATE_UNSTARTED;
     private int mProgress;
-    private boolean isRefreshing;
     private TextView mTextView;
+    private CharSequence[] mPrompts = {"Pull to refresh", "Refreshing", "Success", "Failed"};
 
     private int mCircleCount = 5;
     private int mCircleRadius = 20;
@@ -80,8 +81,7 @@ public class RefreshHeader extends RelativeLayout {
         mCirclePaint.setAlpha(Math.round(255 * Math.min(percent, 1f)));
         invalidate();
 
-        mTextView.setText(isRefreshing ? getResources().getString(R.string.prompt_refreshing) :
-                getResources().getString(R.string.prompt_pull_to_refreshing));
+        mTextView.setText(mPrompts[mState]);
     }
 
     public int getProgress() {
@@ -93,12 +93,12 @@ public class RefreshHeader extends RelativeLayout {
         refresh();
     }
 
-    public boolean isRefreshing() {
-        return isRefreshing;
+    public int getState() {
+        return mState;
     }
 
-    public void setRefreshing(boolean isRefreshing) {
-        this.isRefreshing = isRefreshing;
+    public void setState(int state) {
+        mState = state;
         refresh();
     }
 }
