@@ -1,5 +1,6 @@
 package me.sxwang.pulltorefresh;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -18,13 +19,15 @@ public class RefreshHeader extends RelativeLayout {
     private int mState = PullToRefreshLayout.STATE_UNSTARTED;
     private int mProgress;
     private TextView mTextView;
+    private ValueAnimator mCircleAnimator;
     private CharSequence[] mPrompts = {"Pull to refresh", "Refreshing", "Success", "Failed"};
 
     private int mCircleCount = 5;
-    private int mCircleRadius = 20;
-    private int mCircleBaseGap = 30;
-    private int mMaxExpandableGap = 100;
-    private int mCircleGap = mCircleBaseGap;
+    private int mCircleRadius;
+    private int mCircleBaseGap;
+    private int mMaxExpandableGap;
+    private int mCircleGap;
+    private float mFirstTranslationY = 0;
 
     private RectF mCircleRectF = new RectF();
     private Paint mCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -53,6 +56,11 @@ public class RefreshHeader extends RelativeLayout {
         lp.addRule(ALIGN_PARENT_BOTTOM);
         mTextView.setLayoutParams(lp);
 
+        mCircleRadius = Utils.dpToPx(context, 5);
+        mCircleBaseGap = Utils.dpToPx(context, 10);
+        mCircleGap = mCircleBaseGap;
+        mMaxExpandableGap = Utils.dpToPx(context, 30);
+
         mCirclePaint.setColor(Color.GRAY);
         setWillNotDraw(false);
         refresh();
@@ -66,11 +74,22 @@ public class RefreshHeader extends RelativeLayout {
         mCircleRectF.top = cY - mCircleRadius;
         mCircleRectF.bottom = cY + mCircleRadius;
 
+        if (mState == PullToRefreshLayout.STATE_REFRESHING) {
+            mCircleRectF.top += mFirstTranslationY;
+            mCircleRectF.bottom += mFirstTranslationY;
+        }
+
         for (int i = 0; i < mCircleCount; i++) {
             mCircleRectF.left = startX + i * 2 * mCircleRadius + i * mCircleGap;
             mCircleRectF.right = mCircleRectF.left + 2 * mCircleRadius;
             canvas.drawOval(mCircleRectF, mCirclePaint);
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        cancelCircleAnimation();
     }
 
     private void refresh() {
@@ -81,7 +100,33 @@ public class RefreshHeader extends RelativeLayout {
         mCirclePaint.setAlpha(Math.round(255 * Math.min(percent, 1f)));
         invalidate();
 
+        if (mState == PullToRefreshLayout.STATE_REFRESHING) {
+            startRefreshAnimation();
+        } else {
+            cancelCircleAnimation();
+        }
+
         mTextView.setText(mPrompts[mState]);
+    }
+
+    private void cancelCircleAnimation() {
+        if (mCircleAnimator != null) {
+            mCircleAnimator.cancel();
+        }
+    }
+
+    private void startRefreshAnimation() {
+        mCircleAnimator = ValueAnimator.ofFloat(0, 30);
+        mCircleAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mFirstTranslationY = (float) animation.getAnimatedValue();
+                invalidate();
+            }
+        });
+        mCircleAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        mCircleAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        mCircleAnimator.start();
     }
 
     public int getProgress() {
