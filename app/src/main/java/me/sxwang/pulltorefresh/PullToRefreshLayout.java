@@ -2,14 +2,19 @@ package me.sxwang.pulltorefresh;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ScrollView;
 
 /**
  * Created by wang on 3/18/16.
@@ -23,8 +28,9 @@ public class PullToRefreshLayout extends LinearLayout {
     public static final int DEFAULT_COLLAPSE_DURATION = 250;
 
     private RefreshHeader mRefreshHeader;
-    private ListView mListView;
+    private View mScrollableView;
 
+    private int mTouchSlop = 0;
     private float mActionDownY = 0;
     private boolean isRefreshing = false;
 
@@ -42,6 +48,7 @@ public class PullToRefreshLayout extends LinearLayout {
     }
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
+        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
     }
 
     @Override
@@ -52,26 +59,27 @@ public class PullToRefreshLayout extends LinearLayout {
             if (child instanceof RefreshHeader) {
                 mRefreshHeader = (RefreshHeader) child;
             }
-            if (child instanceof ListView) {
-                mListView = (ListView) child;
+            if (child instanceof ListView || child instanceof GridView || child instanceof RecyclerView
+                    || child instanceof ScrollView || child instanceof NestedScrollView) {
+                mScrollableView = child;
             }
         }
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        int listScrollY = mListView.getChildCount() == 0 ? 0 : mListView.getChildAt(0).getTop();
+        boolean canScrollUp = ViewCompat.canScrollVertically(mScrollableView, -1);
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                if (listScrollY == 0) mActionDownY = ev.getY();
+                if (!canScrollUp) mActionDownY = ev.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (listScrollY == 0 && ev.getY() > mActionDownY + ViewConfiguration.get(getContext()).getScaledTouchSlop()) {
+                if (!canScrollUp && ev.getY() > mActionDownY + mTouchSlop) {
                     return true;
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (listScrollY == 0 && ev.getY() > mActionDownY) {
+                if (!canScrollUp && ev.getY() > mActionDownY + mTouchSlop) {
                     return true;
                 }
         }
