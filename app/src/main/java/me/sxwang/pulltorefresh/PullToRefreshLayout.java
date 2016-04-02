@@ -98,18 +98,20 @@ public class PullToRefreshLayout extends LinearLayout {
 //        Log.i(TAG, "onTouchEvent: " + scrollY);
 
         int scrollThreshold = Utils.dpToPx(getContext(), DEFAULT_SCROLL_THRESHOLD);
-        if (event.getActionMasked() == MotionEvent.ACTION_UP) {
-            boolean shouldRefresh = scrollY >= scrollThreshold;
-            mRefreshHeader.setState(shouldRefresh ? STATE_REFRESHING : STATE_UNSTARTED);
+        boolean shouldRefresh = scrollY >= scrollThreshold;
+        setState(shouldRefresh ? STATE_REFRESHING : STATE_UNSTARTED);
 
-            if (!shouldRefresh) {
-                collapseHeader();
-            } else {
-                if (mOnRefreshListener != null) {
-                    mOnRefreshListener.onRefresh(this);
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_UP:
+
+                if (!shouldRefresh) {
+                    collapseHeader();
+                } else {
+                    if (mOnRefreshListener != null) {
+                        mOnRefreshListener.onRefresh(this);
+                    }
                 }
-            }
-            return true;
+                return true;
         }
 
         // animating progress
@@ -144,15 +146,17 @@ public class PullToRefreshLayout extends LinearLayout {
     }
 
     public void setState(int state) {
-        mState = state;
-        mRefreshHeader.setState(mState);
-        if (mState != STATE_REFRESHING) {
-            postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    collapseHeader();
-                }
-            }, 500);
+        if (mState != state) {
+            mState = state;
+            mRefreshHeader.setState(mState);
+            if (mState == STATE_RESULT_OK || mState == STATE_RESULT_FAIL) {
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        collapseHeader();
+                    }
+                }, 500);
+            }
         }
     }
 
