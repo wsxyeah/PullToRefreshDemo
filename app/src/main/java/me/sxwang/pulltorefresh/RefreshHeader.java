@@ -31,6 +31,7 @@ public class RefreshHeader extends RelativeLayout {
 
     private RectF mCircleRectF = new RectF();
     private Paint mCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private int mStartX;
 
     public RefreshHeader(Context context) {
         this(context, null);
@@ -67,20 +68,23 @@ public class RefreshHeader extends RelativeLayout {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        int cX = canvas.getWidth() / 2, cY = canvas.getHeight() / 2;
-        int startX = (canvas.getWidth() - mCircleCount * mCircleRadius * 2 - (mCircleCount - 1) * mCircleGap) / 2;
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        int cX = w / 2, cY = h / 2;
+        mStartX = (w - mCircleCount * mCircleRadius * 2 - (mCircleCount - 1) * mCircleGap) / 2;
         mCircleRectF.top = cY - mCircleRadius;
         mCircleRectF.bottom = cY + mCircleRadius;
+    }
 
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
         if (mState == PullToRefreshLayout.STATE_REFRESHING) {
             mCircleRectF.top += mFirstTranslationY;
             mCircleRectF.bottom += mFirstTranslationY;
         }
 
         for (int i = 0; i < mCircleCount; i++) {
-            mCircleRectF.left = startX + i * 2 * mCircleRadius + i * mCircleGap;
+            mCircleRectF.left = mStartX + i * 2 * mCircleRadius + i * mCircleGap;
             mCircleRectF.right = mCircleRectF.left + 2 * mCircleRadius;
             canvas.drawOval(mCircleRectF, mCirclePaint);
         }
